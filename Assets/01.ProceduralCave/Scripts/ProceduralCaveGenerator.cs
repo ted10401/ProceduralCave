@@ -94,6 +94,9 @@ public class ProceduralCaveGenerator : MonoBehaviour
                 }
             }
         }
+
+        MarchingSquares marchingSquares = GetComponent<MarchingSquares>();
+        marchingSquares.GenerateMesh(m_map, 1);
     }
 
     private int GetWallCount(int gridX, int gridY)
@@ -122,18 +125,18 @@ public class ProceduralCaveGenerator : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        if(m_map == null)
-        {
-            return;
-        }
+        //if(m_map == null)
+        //{
+        //    return;
+        //}
 
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                Gizmos.color = m_map[x, y] == 1 ? Color.black : Color.white;
-                Gizmos.DrawCube(new Vector3(-width / 2 + x + 0.5f, 0, -height / 2 + y + 0.5f), Vector3.one);
-            }
-        }
+        //for (int x = 0; x < width; x++)
+        //{
+        //    for (int y = 0; y < height; y++)
+        //    {
+        //        Gizmos.color = m_map[x, y] == 1 ? Color.black : Color.white;
+        //        Gizmos.DrawCube(new Vector3(-width / 2 + x + 0.5f, 0, -height / 2 + y + 0.5f), Vector3.one);
+        //    }
+        //}
     }
 }
