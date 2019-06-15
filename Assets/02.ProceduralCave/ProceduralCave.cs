@@ -5,7 +5,7 @@ public class ProceduralCave : MonoBehaviour
 {
     public Vector2Int mapSize = new Vector2Int(10, 10);
     [Range(0f, 1f)] public float cullingValue = 0f;
-    [Range(0, 10)] public int smoothInteration = 0;
+    [Range(0, 10)] public int smoothIteration = 0;
     [Range(0, 8)] public int smoothThreshold = 4;
     public float cubeSize = 1f;
     public bool showMesh;
@@ -35,9 +35,99 @@ public class ProceduralCave : MonoBehaviour
         GenerateMap();
     }
 
+    public bool showAnimation;
+    public float timer;
+    public float generateTimer;
     private void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(showAnimation)
+        {
+            timer += Time.deltaTime;
+
+            if (timer >= 5f)
+            {
+                smoothIteration = 4;
+            }
+
+            if (timer >= 10f)
+            {
+                showMesh = true;
+            }
+
+            if (timer < 2.5f)
+            {
+                cullingValue = (2.5f - timer) / 2.5f;
+                if(cullingValue <= 0)
+                {
+                    cullingValue = 0;
+                }
+            }
+            else if(timer < 5f)
+            {
+                cullingValue = (timer - 2.5f) / 2.5f;
+
+                if (cullingValue >= 1)
+                {
+                    cullingValue = 1;
+                }
+            }
+            else if (timer < 7.5f)
+            {
+                cullingValue = (7.5f - timer) / 2.5f;
+
+                if (cullingValue <= 0)
+                {
+                    cullingValue = 0;
+                }
+            }
+            else if (timer < 10f)
+            {
+                cullingValue = (timer - 7.5f) / 2.5f;
+
+                if (cullingValue >= 1)
+                {
+                    cullingValue = 1;
+                }
+            }
+            else if (timer < 12.5f)
+            {
+                cullingValue = (12.5f - timer) / 2.5f;
+
+                if (cullingValue <= 0)
+                {
+                    cullingValue = 0;
+                }
+            }
+            else if (timer < 15f)
+            {
+                cullingValue = (timer - 12.5f) / 2.5f;
+
+                if (cullingValue >= 1)
+                {
+                    cullingValue = 1;
+                }
+            }
+            else
+            {
+                cullingValue = 0.55f;
+                smoothIteration = 5;
+                smoothThreshold = 4;
+                showMesh = true;
+
+                generateTimer += Time.deltaTime;
+                if(generateTimer >= 1)
+                {
+                    generateTimer = 0f;
+                    GenerateMap();
+                }
+            }
+
+            GenerateCullingMap();
+            GenerateFinalMap();
+            GenerateMesh();
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
         {
             GenerateMap();
         }
@@ -105,12 +195,12 @@ public class ProceduralCave : MonoBehaviour
             }
         }
 
-        if (smoothInteration <= 0)
+        if (smoothIteration <= 0)
         {
             return;
         }
 
-        for (int i = 0; i < smoothInteration; i++)
+        for (int i = 0; i < smoothIteration; i++)
         {
             bool[,] needUpdate = new bool[mapSize.x, mapSize.y];
 
@@ -231,7 +321,7 @@ public class ProceduralCave : MonoBehaviour
         {
             for (int y = 0; y < mapSize.y; y++)
             {
-                if(smoothInteration == 0)
+                if(smoothIteration == 0)
                 {
                     Color color = Color.white * (1 - m_cullingMaps[x, y]);
                     color.a = 1;
