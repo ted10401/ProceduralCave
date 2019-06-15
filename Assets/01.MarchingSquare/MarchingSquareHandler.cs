@@ -13,8 +13,11 @@ public class MarchingSquareHandler : MonoBehaviour
     public Toggle bottomRightToggle;
     public Toggle bottomLeftToggle;
 
-    public float size = 10;
+    public bool showSegments;
+    public float squareSize = 10;
     public MeshFilter meshFilter;
+
+    private MarchingSquare m_marchingSquare;
 
     private void Awake()
     {
@@ -66,11 +69,36 @@ public class MarchingSquareHandler : MonoBehaviour
 
     private void OnToggleValueChanged(bool enabled)
     {
-        MarchingSquare marchingSquare = new MarchingSquare(meshFilter.transform.position, size, topLeftToggle.isOn, topRightToggle.isOn, bottomRightToggle.isOn, bottomLeftToggle.isOn);
+        if(m_marchingSquare == null)
+        {
+            m_marchingSquare = new MarchingSquare(Vector3.zero, squareSize, topLeftToggle.isOn, topRightToggle.isOn, bottomRightToggle.isOn, bottomLeftToggle.isOn);
+        }
+        else
+        {
+            m_marchingSquare.SetNodes(topLeftToggle.isOn, topRightToggle.isOn, bottomRightToggle.isOn, bottomLeftToggle.isOn);
+        }
+
         Mesh mesh = new Mesh();
-        mesh.vertices = marchingSquare.vertices;
-        mesh.triangles = marchingSquare.triangles.ToArray();
+        mesh.vertices = m_marchingSquare.vertices;
+        mesh.triangles = m_marchingSquare.triangles.ToArray();
         mesh.RecalculateNormals();
         meshFilter.mesh = mesh;
+    }
+
+    private void OnDrawGizmos()
+    {
+        if(m_marchingSquare == null || !showSegments)
+        {
+            return;
+        }
+
+        Gizmos.color = Color.black;
+
+        for(int i = 0; i < m_marchingSquare.triangles.Count; i += 3)
+        {
+            Gizmos.DrawLine(meshFilter.transform.position + m_marchingSquare.vertices[m_marchingSquare.triangles[i]], meshFilter.transform.position + m_marchingSquare.vertices[m_marchingSquare.triangles[i + 1]]);
+            Gizmos.DrawLine(meshFilter.transform.position + m_marchingSquare.vertices[m_marchingSquare.triangles[i]], meshFilter.transform.position + m_marchingSquare.vertices[m_marchingSquare.triangles[i + 2]]);
+            Gizmos.DrawLine(meshFilter.transform.position + m_marchingSquare.vertices[m_marchingSquare.triangles[i + 1]], meshFilter.transform.position + m_marchingSquare.vertices[m_marchingSquare.triangles[i + 2]]);
+        }
     }
 }

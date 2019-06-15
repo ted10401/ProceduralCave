@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class DynamicProceduralCave : MonoBehaviour
+public class ProceduralCave : MonoBehaviour
 {
     public Vector2Int mapSize = new Vector2Int(10, 10);
     [Range(0f, 1f)] public float cullingValue = 0f;
@@ -17,6 +17,14 @@ public class DynamicProceduralCave : MonoBehaviour
 
     private void OnValidate()
     {
+        if(m_floatMaps != null)
+        {
+            if(m_floatMaps.GetLength(0) != mapSize.x || m_floatMaps.GetLength(1) != mapSize.y)
+            {
+                GenerateFloatMap();
+            }
+        }
+
         GenerateCullingMap();
         GenerateFinalMap();
         GenerateMesh();
@@ -115,7 +123,7 @@ public class DynamicProceduralCave : MonoBehaviour
                     {
                         needUpdate[x, y] = m_finalMaps[x, y] == 0;
                     }
-                    else
+                    else if (wallCount < smoothThreshold)
                     {
                         needUpdate[x, y] = m_finalMaps[x, y] == 1;
                     }
@@ -144,10 +152,12 @@ public class DynamicProceduralCave : MonoBehaviour
             {
                 if (x >= 0 && x < mapSize.x && y >= 0 && y < mapSize.y)
                 {
-                    if (x != gridX || y != gridY)
+                    if(x == gridX && y == gridY)
                     {
-                        wallCount += maps[x, y];
+                        continue;
                     }
+
+                    wallCount += maps[x, y];
                 }
                 else
                 {
@@ -174,25 +184,27 @@ public class DynamicProceduralCave : MonoBehaviour
 
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
+        MarchingSquare marchingSquare = new MarchingSquare();
+        int count = 0;
 
         for (int x = 0; x < mapSize.x - 1; x++)
         {
             for (int y = 0; y < mapSize.y - 1; y++)
             {
-                MarchingSquare marchingSquare = new MarchingSquare(
-                    new Vector3((float)-mapSize.x / 2 + x + cubeSize, (float)-mapSize.y / 2 + y + cubeSize, 0),
-                    1,
+                marchingSquare.SetCenter(new Vector3(-mapSize.x * 0.5f + x + cubeSize, -mapSize.y * 0.5f + y + cubeSize, 0));
+                marchingSquare.SetNodes(
                     m_finalMaps[x, y + 1] == 1,
                     m_finalMaps[x + 1, y + 1] == 1,
                     m_finalMaps[x + 1, y] == 1,
                     m_finalMaps[x, y] == 1);
 
-                foreach(int triangle in marchingSquare.triangles)
+                vertices.AddRange(marchingSquare.vertices);
+                foreach (int triangle in marchingSquare.triangles)
                 {
-                    triangles.Add(triangle + vertices.Count);
+                    triangles.Add(triangle + count);
                 }
 
-                vertices.AddRange(marchingSquare.vertices);
+                count += 8;
             }
         }
 

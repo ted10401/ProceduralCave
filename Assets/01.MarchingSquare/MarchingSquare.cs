@@ -4,6 +4,7 @@ using System.Collections.Generic;
 public class MarchingSquare
 {
     public int configuration;
+    public Vector3 center;
     public float size = 1;
     public bool topLeft;
     public bool topRight;
@@ -11,17 +12,35 @@ public class MarchingSquare
     public bool botoomLeft;
 
     public Vector3[] vertices = new Vector3[8];
-    public List<int> triangles;
+    public List<int> triangles = new List<int>();
+
+    public MarchingSquare()
+    {
+
+    }
 
     public MarchingSquare(Vector3 center, float size, bool topLeft, bool topRight, bool bottomRight, bool bottomLeft)
     {
-        UpdateSize(center, size);
-        AssignNodes(topLeft, topRight, bottomRight, bottomLeft);
+        this.center = center;
+        this.size = size;
+        UpdateVertices();
+        SetNodes(topLeft, topRight, bottomRight, bottomLeft);
     }
 
-    public void UpdateSize(Vector3 center, float size)
+    public void SetCenter(Vector3 center)
+    {
+        this.center = center;
+        UpdateVertices();
+    }
+
+    public void SetSize(float size)
     {
         this.size = size;
+        UpdateVertices();
+    }
+
+    private void UpdateVertices()
+    {
         vertices[0] = center + new Vector3(-size / 2, size / 2, 0);
         vertices[1] = center + new Vector3(0, size / 2, 0);
         vertices[2] = center + new Vector3(size / 2, size / 2, 0);
@@ -32,10 +51,8 @@ public class MarchingSquare
         vertices[7] = center + new Vector3(-size / 2, 0, 0);
     }
 
-    public void AssignNodes(bool topLeft, bool topRight, bool bottomRight, bool bottomLeft)
+    public void SetNodes(bool topLeft, bool topRight, bool bottomRight, bool bottomLeft)
     {
-        triangles = new List<int>();
-
         configuration = 0;
         if (topLeft)
         {
@@ -57,12 +74,14 @@ public class MarchingSquare
             configuration += 1;
         }
 
-        Generate();
+        GenerateTriangles();
     }
 
-    private void Generate()
+    private void GenerateTriangles()
     {
-        switch(configuration)
+        triangles.Clear();
+
+        switch (configuration)
         {
             case 8:
                 AddTriagnles(0, 1, 7);
