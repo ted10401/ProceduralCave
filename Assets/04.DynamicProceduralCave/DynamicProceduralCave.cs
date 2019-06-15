@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class DynamicProceduralCave : MonoBehaviour
 {
@@ -7,7 +8,9 @@ public class DynamicProceduralCave : MonoBehaviour
     [Range(0, 10)] public int smoothInteration = 0;
     [Range(0, 8)] public int smoothThreshold = 4;
     public float cubeSize = 1f;
+    public bool showMesh;
 
+    public MeshFilter meshFilter;
     private float[,] m_floatMaps;
     private float[,] m_cullingMaps;
     private int[,] m_finalMaps;
@@ -16,6 +19,7 @@ public class DynamicProceduralCave : MonoBehaviour
     {
         GenerateCullingMap();
         GenerateFinalMap();
+        GenerateMesh();
     }
 
     private void Awake()
@@ -36,6 +40,7 @@ public class DynamicProceduralCave : MonoBehaviour
         GenerateFloatMap();
         GenerateCullingMap();
         GenerateFinalMap();
+        GenerateMesh();
     }
 
     private void GenerateFloatMap()
@@ -78,7 +83,7 @@ public class DynamicProceduralCave : MonoBehaviour
 
     private void GenerateFinalMap()
     {
-        if(smoothInteration <= 0)
+        if(m_cullingMaps == null)
         {
             return;
         }
@@ -90,6 +95,11 @@ public class DynamicProceduralCave : MonoBehaviour
             {
                 m_finalMaps[x, y] = m_cullingMaps[x, y] >= cullingValue ? 1 : 0;
             }
+        }
+
+        if (smoothInteration <= 0)
+        {
+            return;
         }
 
         for (int i = 0; i < smoothInteration; i++)
@@ -149,9 +159,58 @@ public class DynamicProceduralCave : MonoBehaviour
         return wallCount;
     }
 
+    private void GenerateMesh()
+    {
+        if (!showMesh)
+        {
+            meshFilter.mesh = null;
+            return;
+        }
+
+        if (m_finalMaps == null)
+        {
+            return;
+        }
+
+        List<Vector3> vertices = new List<Vector3>();
+        List<int> triangles = new List<int>();
+
+        for (int x = 0; x < mapSize.x - 1; x++)
+        {
+            for (int y = 0; y < mapSize.y - 1; y++)
+            {
+                MarchingSquare marchingSquare = new MarchingSquare(
+                    new Vector3((float)-mapSize.x / 2 + x + cubeSize, (float)-mapSize.y / 2 + y + cubeSize, 0),
+                    1,
+                    m_finalMaps[x, y + 1] == 1,
+                    m_finalMaps[x + 1, y + 1] == 1,
+                    m_finalMaps[x + 1, y] == 1,
+                    m_finalMaps[x, y] == 1);
+
+                foreach(int triangle in marchingSquare.triangles)
+                {
+                    triangles.Add(triangle + vertices.Count);
+                }
+
+                vertices.AddRange(marchingSquare.vertices);
+            }
+        }
+
+        Mesh mesh = new Mesh();
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.RecalculateNormals();
+        meshFilter.mesh = mesh;
+    }
+
     private void OnDrawGizmos()
     {
-        if(m_floatMaps == null)
+        if(showMesh)
+        {
+            return;
+        }
+
+        if (m_floatMaps == null)
         {
             return;
         }

@@ -1,11 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class MarchingSquare : MonoBehaviour
+public class MarchingSquare
 {
-    public MeshFilter meshFilter;
-    public MeshRenderer meshRenderer;
-
     public int configuration;
     public float size = 1;
     public bool topLeft;
@@ -13,31 +10,31 @@ public class MarchingSquare : MonoBehaviour
     public bool bottomRight;
     public bool botoomLeft;
 
-    private Vector3[] m_vertices = new Vector3[8];
-    private List<int> m_triangles;
+    public Vector3[] vertices = new Vector3[8];
+    public List<int> triangles;
 
-    private void OnValidate()
+    public MarchingSquare(Vector3 center, float size, bool topLeft, bool topRight, bool bottomRight, bool bottomLeft)
     {
-        UpdateSize(size);
-        AssignNodes(topLeft, topRight, bottomRight, botoomLeft);
+        UpdateSize(center, size);
+        AssignNodes(topLeft, topRight, bottomRight, bottomLeft);
     }
 
-    public void UpdateSize(float size)
+    public void UpdateSize(Vector3 center, float size)
     {
         this.size = size;
-        m_vertices[0] = new Vector3(-size / 2, size / 2, 0);
-        m_vertices[1] = new Vector3(0, size / 2, 0);
-        m_vertices[2] = new Vector3(size / 2, size / 2, 0);
-        m_vertices[3] = new Vector3(size / 2, 0, 0);
-        m_vertices[4] = new Vector3(size / 2, -size / 2, 0);
-        m_vertices[5] = new Vector3(0, -size / 2, 0);
-        m_vertices[6] = new Vector3(-size / 2, -size / 2, 0);
-        m_vertices[7] = new Vector3(-size / 2, 0, 0);
+        vertices[0] = center + new Vector3(-size / 2, size / 2, 0);
+        vertices[1] = center + new Vector3(0, size / 2, 0);
+        vertices[2] = center + new Vector3(size / 2, size / 2, 0);
+        vertices[3] = center + new Vector3(size / 2, 0, 0);
+        vertices[4] = center + new Vector3(size / 2, -size / 2, 0);
+        vertices[5] = center + new Vector3(0, -size / 2, 0);
+        vertices[6] = center + new Vector3(-size / 2, -size / 2, 0);
+        vertices[7] = center + new Vector3(-size / 2, 0, 0);
     }
 
     public void AssignNodes(bool topLeft, bool topRight, bool bottomRight, bool bottomLeft)
     {
-        m_triangles = new List<int>();
+        triangles = new List<int>();
 
         configuration = 0;
         if (topLeft)
@@ -116,43 +113,36 @@ public class MarchingSquare : MonoBehaviour
                 AddTriagnles(0, 2, 4, 6);
                 break;
         }
-
-        Mesh mesh = new Mesh();
-        mesh.vertices = m_vertices;
-        mesh.triangles = m_triangles.ToArray();
-        mesh.RecalculateNormals();
-
-        meshFilter.mesh = mesh;
     }
 
-    private void AddTriagnles(params int[] triangles)
+    private void AddTriagnles(params int[] indexes)
     {
-        if(triangles.Length >= 3)
+        if(indexes.Length >= 3)
         {
-            m_triangles.Add(triangles[0]);
-            m_triangles.Add(triangles[1]);
-            m_triangles.Add(triangles[2]);
+            triangles.Add(indexes[0]);
+            triangles.Add(indexes[1]);
+            triangles.Add(indexes[2]);
         }
 
-        if (triangles.Length >= 4)
+        if (indexes.Length >= 4)
         {
-            m_triangles.Add(triangles[0]);
-            m_triangles.Add(triangles[2]);
-            m_triangles.Add(triangles[3]);
+            triangles.Add(indexes[0]);
+            triangles.Add(indexes[2]);
+            triangles.Add(indexes[3]);
         }
 
-        if (triangles.Length >= 5)
+        if (indexes.Length >= 5)
         {
-            m_triangles.Add(triangles[0]);
-            m_triangles.Add(triangles[3]);
-            m_triangles.Add(triangles[4]);
+            triangles.Add(indexes[0]);
+            triangles.Add(indexes[3]);
+            triangles.Add(indexes[4]);
         }
 
-        if (triangles.Length >= 6)
+        if (indexes.Length >= 6)
         {
-            m_triangles.Add(triangles[0]);
-            m_triangles.Add(triangles[4]);
-            m_triangles.Add(triangles[5]);
+            triangles.Add(indexes[0]);
+            triangles.Add(indexes[4]);
+            triangles.Add(indexes[5]);
         }
     }
 }

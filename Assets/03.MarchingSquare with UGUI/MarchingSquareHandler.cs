@@ -13,7 +13,8 @@ public class MarchingSquareHandler : MonoBehaviour
     public Toggle bottomRightToggle;
     public Toggle bottomLeftToggle;
 
-    public MarchingSquare marchingSquare;
+    public float size = 10;
+    public MeshFilter meshFilter;
 
     private void Awake()
     {
@@ -65,6 +66,11 @@ public class MarchingSquareHandler : MonoBehaviour
 
     private void OnToggleValueChanged(bool enabled)
     {
-        marchingSquare.AssignNodes(topLeftToggle.isOn, topRightToggle.isOn, bottomRightToggle.isOn, bottomLeftToggle.isOn);
+        MarchingSquare marchingSquare = new MarchingSquare(meshFilter.transform.position, size, topLeftToggle.isOn, topRightToggle.isOn, bottomRightToggle.isOn, bottomLeftToggle.isOn);
+        Mesh mesh = new Mesh();
+        mesh.vertices = marchingSquare.vertices;
+        mesh.triangles = marchingSquare.triangles.ToArray();
+        mesh.RecalculateNormals();
+        meshFilter.mesh = mesh;
     }
 }

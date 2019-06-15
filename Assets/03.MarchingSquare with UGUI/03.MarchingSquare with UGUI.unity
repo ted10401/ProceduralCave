@@ -682,7 +682,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 608039375}
-  - component: {fileID: 608039374}
   - component: {fileID: 608039373}
   - component: {fileID: 608039372}
   m_Layer: 0
@@ -737,26 +736,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 608039371}
   m_Mesh: {fileID: 359193923}
---- !u!114 &608039374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 608039371}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6bb6129386bc54475ac1583503d14fee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  meshFilter: {fileID: 608039373}
-  meshRenderer: {fileID: 608039372}
-  configuration: 11
-  size: 10
-  topLeft: 1
-  topRight: 0
-  bottomRight: 1
-  botoomLeft: 1
 --- !u!4 &608039375
 Transform:
   m_ObjectHideFlags: 0
@@ -1344,11 +1323,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e0fa21957a4c940818896d73e8366ece, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  automatically: 0
+  timer: 0.5
+  configuration: 0
   topLeftToggle: {fileID: 1427413443}
   topRightToggle: {fileID: 2079097974}
   bottomRightToggle: {fileID: 995048811}
   bottomLeftToggle: {fileID: 2130340215}
-  marchingSquare: {fileID: 608039374}
+  size: 10
+  meshFilter: {fileID: 608039373}
 --- !u!1 &1355930775
 GameObject:
   m_ObjectHideFlags: 0
